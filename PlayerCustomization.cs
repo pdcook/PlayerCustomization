@@ -21,9 +21,9 @@ namespace PlayerCustomization
     public class PlayerCustomization : BaseUnityPlugin
     {
         private const string ModId = "pykess.rounds.plugins.playercustomization";
-        private const string ModName = "Player Customization";
+        internal const string ModName = "Player Customization";
         public const string Version = "0.0.0";
-        private string CompatibilityModName => ModName.Replace(" ", "");
+        internal static string CompatibilityModName => ModName.Replace(" ", "");
 
         public static PlayerCustomization instance;
 
@@ -54,7 +54,6 @@ namespace PlayerCustomization
             {
                 this.ExecuteAfterFrames(10, () =>
                 {
-                    UnityEngine.Debug.Log("MainMenuHandler.Awake");
                     URLCharacterItemManager.CreateURLCharacterItemPrefab("Test");
                     CustomCharacterItemManager.AddCustomCharacterItem(URLCharacterItemManager.GetURLCharacterItemPrefab("Test").gameObject, CharacterItemType.Detail);
                 });
@@ -68,7 +67,7 @@ namespace PlayerCustomization
             Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess"});
 
             // add GUI to modoptions menu
-            //Unbound.RegisterMenu(ModName, () => { }, GUI, null, false);
+            Unbound.RegisterMenu(ModName, () => { }, URLCharacterItemManager.URLItemsMenu, null, false);
 
         }
 
