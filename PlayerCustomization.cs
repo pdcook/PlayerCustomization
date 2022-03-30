@@ -54,8 +54,7 @@ namespace PlayerCustomization
             {
                 this.ExecuteAfterFrames(10, () =>
                 {
-                    URLCharacterItemManager.CreateURLCharacterItemPrefab("Test");
-                    CustomCharacterItemManager.AddCustomCharacterItem(URLCharacterItemManager.GetURLCharacterItemPrefab("Test").gameObject, CharacterItemType.Detail);
+                    URLCharacterItemManager.AddItemsToCharacterCreator();
                 });
 
                 orig(self);
@@ -68,6 +67,9 @@ namespace PlayerCustomization
 
             // add GUI to modoptions menu
             Unbound.RegisterMenu(ModName, () => { }, URLCharacterItemManager.URLItemsMenu, null, false);
+
+            // init url character item manager
+            URLCharacterItemManager.Init();
 
         }
 

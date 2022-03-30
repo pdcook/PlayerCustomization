@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomCharacterItemManager.cs" />
+    <Compile Include="Extensions\CharacterCreatorItemLoader.cs" />
     <Compile Include="URLCharacterItemManager.cs" />
     <Compile Include="URLCharacterItem.cs" />
     <Compile Include="PlayerCustomization.cs" />

@@ -13,42 +13,79 @@ namespace PlayerCustomization
 
         public const string defaultURL = "https://upload.wikimedia.org/wikipedia/commons/5/50/Smile_Image.png";
 
-        public static Dictionary<string, URLCharacterItem> items = new Dictionary<string, URLCharacterItem>() { };
+        private static Dictionary<CharacterItemType, List<URLCharacterItem>> items = new Dictionary<CharacterItemType, List<URLCharacterItem>>() { };
 
         private static Dictionary<CharacterItemType, List<List<TextMeshProUGUI>>> itemButtons = new Dictionary<CharacterItemType, List<List<TextMeshProUGUI>>>() { };
+        private static bool inited = false;
 
-        public static void CreateURLCharacterItemPrefab(string name, string url = defaultURL)
+        private static URLCharacterItem currentPreviewItem = null;
+
+        public static void Init(bool force = false)
         {
-            if (items.ContainsKey(name))
+            if (inited && !force) { return; }
+            inited = true;
+
+            items[CharacterItemType.Eyes] = Enumerable.Repeat<URLCharacterItem>(null, ITEMS_PER_TYPE).ToList();
+            items[CharacterItemType.Mouth] = Enumerable.Repeat<URLCharacterItem>(null, ITEMS_PER_TYPE).ToList();
+            items[CharacterItemType.Detail] = Enumerable.Repeat<URLCharacterItem>(null, ITEMS_PER_TYPE).ToList();
+
+            for (int i = 0; i < ITEMS_PER_TYPE; i++)
             {
-                UnityEngine.Debug.LogError("URLCharacterItemManager: CreateURLCharacterItemPrefab: Item with name " + name + " already exists");
+                CreateURLCharacterItemPrefab(i, CharacterItemType.Eyes, GetURL(i, CharacterItemType.Eyes));
+                CreateURLCharacterItemPrefab(i, CharacterItemType.Mouth, GetURL(i, CharacterItemType.Mouth));
+                CreateURLCharacterItemPrefab(i, CharacterItemType.Detail, GetURL(i, CharacterItemType.Detail));
+            }
+
+        }
+
+        public static void CreateURLCharacterItemPrefab(int ID, CharacterItemType itemType, string url = defaultURL)
+        {
+            if (ID < 0 || ID >= ITEMS_PER_TYPE)
+            {
+                UnityEngine.Debug.LogError("URLCharacterItemManager::CreateURLCharacterItemPrefab: ID out of range.");
                 return;
             }
-            GameObject prefab = new GameObject(name);
+
+            // construct an empty list if it doesn't exist already
+            if (items[itemType] is null) { items[itemType] = Enumerable.Repeat<URLCharacterItem>(null, ITEMS_PER_TYPE).ToList(); }
+
+            if (items.ContainsKey(itemType) && items[itemType][ID] != null)
+            {
+                UnityEngine.Debug.LogError($"URLCharacterItemManager: CreateURLCharacterItemPrefab: {itemType} item with ID {ID} already exists.");
+                return;
+            }
+            GameObject prefab = new GameObject($"URL {GetDefaultItemName(ID, itemType)}");
             UnityEngine.GameObject.DontDestroyOnLoad(prefab);
             URLCharacterItem item = prefab.AddComponent<URLCharacterItem>();
+            item.URLItemID = ID;
+            item.ItemType = itemType;
             prefab.AddComponent<SpriteRenderer>();
-            item.name = name;
             item.URL = url;
-            URLCharacterItemManager.SetURLCharacterItemPrefab(item);
+            items[itemType][ID] = item;
+        }
+        public static void AddItemsToCharacterCreator()
+        {
+            for (int i = 0; i < ITEMS_PER_TYPE; i++)
+            {
+                CustomCharacterItemManager.AddCustomCharacterItem(GetURLCharacterItemPrefab(i, CharacterItemType.Eyes).gameObject, CharacterItemType.Eyes);
+                CustomCharacterItemManager.AddCustomCharacterItem(GetURLCharacterItemPrefab(i, CharacterItemType.Mouth).gameObject, CharacterItemType.Mouth);
+                CustomCharacterItemManager.AddCustomCharacterItem(GetURLCharacterItemPrefab(i, CharacterItemType.Detail).gameObject, CharacterItemType.Detail);
+            }
         }
 
-        public static URLCharacterItem GetURLCharacterItemPrefab(string name)
+        public static URLCharacterItem GetURLCharacterItemPrefab(int ID, CharacterItemType itemType)
         {
-            name = name.Replace("(Clone)", "").ToLower();
-            if (items.ContainsKey(name))
+            if (ID < 0 || ID >= ITEMS_PER_TYPE)
             {
-                return items[name];
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("URLCharacterItemManager: GetURLCharacterItemPrefab: Item with name " + name + " does not exist");
+                UnityEngine.Debug.LogError("URLCharacterItemManager::GetURLCharacterItemPrefab: ID out of range.");
                 return null;
             }
-        }
-        public static void SetURLCharacterItemPrefab(URLCharacterItem item)
-        {
-            items[item.name.Replace("(Clone)", "").ToLower()] = item;
+            else if (items[itemType][ID] is null)
+            {
+                UnityEngine.Debug.LogError($"URLCharacterItemManager::GetURLCharacterItemPrefab: {itemType} item with ID {ID} does not exist.");
+                return null;
+            }
+            return items[itemType][ID];
         }
         internal static string GetConfigKey(string key) => $"{PlayerCustomization.CompatibilityModName}_URLItem_{key}";
 
@@ -77,13 +114,17 @@ namespace PlayerCustomization
             PlayerPrefs.SetFloat(GetConfigKey($"{itemType}{itemID}HealthBarOffset"), offset);
         }
 
+        internal static string GetDefaultItemName(int id, CharacterItemType itemType)
+        {
+            return $"{itemType} {id + 1}".ToUpper();
+        }
         internal static string GetItemName(int id, CharacterItemType itemType)
         {
-            string name = PlayerPrefs.GetString(GetConfigKey($"{itemType}{id}Name"), $"{itemType} {id + 1}".ToUpper());
+            string name = PlayerPrefs.GetString(GetConfigKey($"{itemType}{id}Name"), GetDefaultItemName(id, itemType));
             if (name.Length <= 0 || name.Length > 32)
             {
-                SetItemName(id, itemType, $"{itemType} {id + 1}".ToUpper());
-                name = PlayerPrefs.GetString(GetConfigKey($"{itemType}{id}Name"), $"{itemType} {id + 1}".ToUpper());
+                SetItemName(id, itemType, GetDefaultItemName(id, itemType));
+                name = PlayerPrefs.GetString(GetConfigKey($"{itemType}{id}Name"), GetDefaultItemName(id, itemType));
             }
             return name;
         }
@@ -119,7 +160,7 @@ namespace PlayerCustomization
                 // must create a local copy by value of the index
                 int j = i;
                 string name = $"{GetItemName(j, itemType)}";
-                GameObject editItemObj = MenuHandler.CreateMenu(name, () => { }, menu, 60, true, true, menu.transform.parent.gameObject);
+                GameObject editItemObj = MenuHandler.CreateMenu(name, () => { SetupItemPreview(j, itemType); }, menu, 60, true, true, menu.transform.parent.gameObject);
                 EditItemMenu(editItemObj, itemType, j);
                 if (menu.transform.Find("Group/Grid/Scroll View/Viewport/Content"))
                 {
@@ -135,10 +176,38 @@ namespace PlayerCustomization
                 }
             }
         }
-
-        private static void EditItemMenu(GameObject menu, CharacterItemType itemType, int ID)
+        private static GameObject _PlayerPreview = null;
+        private static GameObject PlayerPreview
         {
-            void ChangeItemName(string newName)
+            get
+            {
+                if (_PlayerPreview is null)
+                {
+                    _PlayerPreview = GameObject.Instantiate(CharacterCreatorHandler.instance.transform.GetChild(0).GetChild(1).GetChild(0).gameObject);
+                    _PlayerPreview.transform.Find("PutItemsUnderHere").gameObject.GetComponent<CharacterCreatorDragging>().enabled = false;
+                    _PlayerPreview.transform.position = new Vector3(0f, 2.25f, 0f);
+                    GameObject.DontDestroyOnLoad(_PlayerPreview);
+                }
+                return _PlayerPreview;
+            }
+        }
+        private static void SetupItemPreview(int ID, CharacterItemType itemType)
+        {
+            PlayerPreview.SetActive(true);
+            DestroyAllChildren(PlayerPreview.transform.Find("PutItemsUnderHere"));
+
+            currentPreviewItem = GameObject.Instantiate(GetURLCharacterItemPrefab(ID, itemType).gameObject, PlayerPreview.transform.Find("PutItemsUnderHere")).GetComponent<URLCharacterItem>();
+            currentPreviewItem.transform.localScale = Vector3.one * GetScale(ID, itemType);
+            currentPreviewItem.transform.localPosition = Vector3.zero;
+        }
+
+        private static void EditItemMenu(GameObject menu, CharacterItemType itemTypeToEdit, int IDToEdit)
+        {
+            // copy by value certain parameters
+            int ID_ = IDToEdit;
+            CharacterItemType itemType_ = itemTypeToEdit;
+
+            void ChangeItemName(string newName, int ID, CharacterItemType itemType)
             {
                 if (newName.Length > 0 && newName.Length <= 32)
                 {
@@ -146,26 +215,57 @@ namespace PlayerCustomization
                     SetItemName(ID, itemType, newName);
                 }
             }
-            itemButtons[itemType][ID].Add(MenuHandler.CreateText(GetItemName(ID, itemType), menu, out TextMeshProUGUI _, 60).GetComponentInChildren<TextMeshProUGUI>());
-            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            // TODO: create preview
-            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateInputField(GetItemName(ID, itemType), 60, menu, ChangeItemName);
-            void ChangeURL(string newURL)
+            itemButtons[itemType_][ID_].Add(MenuHandler.CreateText(GetItemName(ID_, itemType_), menu, out TextMeshProUGUI _, 60).GetComponentInChildren<TextMeshProUGUI>());
+
+            // create space for player preview
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 60);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 60);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 60);
+
+            MenuHandler.CreateInputField(GetItemName(ID_, itemType_), 60, menu, v=>ChangeItemName(v, ID_, itemType_));
+            void ChangeURL(string newURL, int ID, CharacterItemType itemType)
             {
+                // check if the new URL ends with '.png', '.jpg', or '.jpeg'
+                if (  !newURL.EndsWith(".png", true, System.Globalization.CultureInfo.InvariantCulture)
+                    & !newURL.EndsWith(".jpg", true, System.Globalization.CultureInfo.InvariantCulture)
+                    & !newURL.EndsWith(".jpeg", true, System.Globalization.CultureInfo.InvariantCulture))
+                {
+                    return;
+                }
+
                 SetURL(ID, itemType, newURL);
+                GetURLCharacterItemPrefab(ID, itemType).URL = newURL;
+                if (currentPreviewItem != null)
+                {
+                    currentPreviewItem.SetImage(newURL);
+                }
             }
-            MenuHandler.CreateInputField(GetURL(ID, itemType), 60, menu, ChangeURL);
-            void ChangeScale(float newScale)
+            MenuHandler.CreateInputField(GetURL(ID_, itemType_), 60, menu, v => ChangeURL(v, ID_, itemType_));
+            void ChangeScale(float newScale, int ID, CharacterItemType itemType)
             {
+                SetScale(ID, itemType, newScale);
+                if (currentPreviewItem != null) { currentPreviewItem.transform.localScale = Vector3.one * newScale; }
             }
-            MenuHandler.CreateSlider("Scale", menu, 45, 0f, 10f, 1f, ChangeScale, out Slider _, false);
-            void ChangeHealthBarOffset(float newOffset)
+            MenuHandler.CreateSlider("Scale", menu, 45, 0f, 10f, 1f, v => ChangeScale(v, ID_, itemType_), out Slider _, false);
+            void ChangeHealthBarOffset(float newOffset, int ID, CharacterItemType itemType)
             {
-                
+                SetHealthBarOffset(ID, itemType, newOffset);
             }
-            MenuHandler.CreateSlider("Health Bar Offset", menu, 45, 0f, 2f, 0f, ChangeHealthBarOffset, out Slider _, false);
+            MenuHandler.CreateSlider("Health Bar Offset", menu, 45, 0f, 2f, 0f, v => ChangeHealthBarOffset(v, ID_, itemType_), out Slider _, false);
+
+            // add action to back button to destroy the item and hide the preview object
+            menu.transform.Find("Group/Back").gameObject.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                PlayerPreview.SetActive(false);
+                DestroyAllChildren(PlayerPreview.transform.Find("PutItemsUnderHere"));
+            });
+        }
+        private static void DestroyAllChildren(Transform transform)
+        {
+            while (transform.childCount > 0)
+            {
+                GameObject.DestroyImmediate(transform.GetChild(0).gameObject);
+            }
         }
         private static void UpdateItemNameObjects(int id, CharacterItemType itemType, string newName)
         {
