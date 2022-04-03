@@ -6,11 +6,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PlayerCustomization</RootNamespace>
-    <AssemblyName>PlayerCustomization</AssemblyName>
+    <RootNamespace>URLCharacterItems</RootNamespace>
+    <AssemblyName>URLCharacterItems</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectGuid>{615FD723-E714-4F78-9BAE-DC91790F95C0}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,18 +44,8 @@
     <Reference Include="BepInEx, Version=5.4.11.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(ProfileFolder)\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="CardChoiceSpawnUniqueCardPatch">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\BepInEx\plugins\CardChoiceSpawnUniqueCardPatch.dll</HintPath>
-    </Reference>
-    <Reference Include="InControl, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\InControl.dll</HintPath>
-    </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\BepInEx\plugins\MMHOOK_Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="ModdingUtils">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\BepInEx\plugins\ModdingUtils.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\BepInEx\plugins\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="PhotonRealtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(RoundsFolder)\Rounds_Data\Managed\PhotonRealtime.dll</HintPath>
@@ -69,7 +58,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnboundLib, Version=2.11.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\UnboundLib.2.11.1\lib\net461\UnboundLib.dll</HintPath>
+      <HintPath>..\packages\UnboundLib.2.11.1\lib\net461\UnboundLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(RoundsFolder)\Rounds_Data\Managed\Unity.TextMeshPro.dll</HintPath>
@@ -104,28 +94,25 @@
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(RoundsFolder)\Rounds_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestTextureModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomCharacterItemManager.cs" />
-    <Compile Include="Extensions\CharacterCreatorItemLoader.cs" />
-    <Compile Include="Extensions\CharacterItem.cs" />
-    <Compile Include="Patches\CharacterCreatorItemLoader.cs" />
-    <Compile Include="Patches\CharacterItemMirror.cs" />
-    <Compile Include="Patches\CharacterItem.cs" />
-    <Compile Include="Patches\CopyChildren.cs" />
-    <Compile Include="PlayerCustomization.cs" />
+    <Compile Include="UniGif\UniGif.cs" />
+    <Compile Include="UniGif\UniGifConst.cs" />
+    <Compile Include="UniGif\UniGifDecoder.cs" />
+    <Compile Include="UniGif\UniGifExtension.cs" />
+    <Compile Include="UniGif\UniGifFormatter.cs" />
+    <Compile Include="URLCharacterItems.cs" />
+    <Compile Include="URLCharacterItemManager.cs" />
+    <Compile Include="URLCharacterItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
     <Content Include="AssetsEmbedded\.gitkeep" />
     <Content Include="Networking\.gitkeep" />
     <Content Include="Extensions\.gitkeep" />
@@ -135,7 +122,12 @@
     <Content Include="publish.ps1" />
     <Content Include="ThunderStore\icon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PlayerCustomization.csproj">
+      <Project>{615fd723-e714-4f78-9bae-dc91790f95c0}</Project>
+      <Name>PlayerCustomization</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

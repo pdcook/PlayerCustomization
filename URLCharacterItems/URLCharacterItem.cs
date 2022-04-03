@@ -10,7 +10,7 @@ using PlayerCustomization.Extensions;
 using System.Collections.Generic;
 using TMPro;
 using Photon.Realtime;
-namespace PlayerCustomization
+namespace URLCharacterItems
 {
     public class URLCharacterItem : MonoBehaviour
     {

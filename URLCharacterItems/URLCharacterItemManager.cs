@@ -5,7 +5,8 @@ using UnboundLib;
 using TMPro;
 using UnityEngine.UI;
 using UnboundLib.Utils.UI;
-namespace PlayerCustomization
+using PlayerCustomization;
+namespace URLCharacterItems
 {
     public static class URLCharacterItemManager
     {
@@ -88,7 +89,7 @@ namespace PlayerCustomization
             }
             return items[itemType][ID];
         }
-        internal static string GetConfigKey(string key) => $"{PlayerCustomization.CompatibilityModName}_URLItem_{key}";
+        internal static string GetConfigKey(string key) => $"{URLCharacterItems.CompatibilityModName}_URLItem_{key}";
         public static bool GetRemoteURLObjectsEnabled()
         {
             return PlayerPrefs.GetInt(GetConfigKey("RemoteURLObjectsEnabled"), 1) == 1;

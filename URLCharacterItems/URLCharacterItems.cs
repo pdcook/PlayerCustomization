@@ -1,31 +1,23 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using UnboundLib;
-using UnityEngine;
-using UnboundLib.Utils.UI;
-using UnboundLib.GameModes;
 using TMPro;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using UnboundLib.Networking;
-using Photon.Pun;
-using On;
+using UnboundLib;
+using UnboundLib.Utils.UI;
+using UnityEngine;
 
-namespace PlayerCustomization
+namespace URLCharacterItems
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)] // necessary for most modding stuff here
     [BepInPlugin(ModId, ModName, Version)]
     [BepInProcess("Rounds.exe")]
-    public class PlayerCustomization : BaseUnityPlugin
+    public class URLCharacterItems : BaseUnityPlugin
     {
-        private const string ModId = "pykess.rounds.plugins.playercustomization";
-        internal const string ModName = "Player Customization";
+        private const string ModId = "pykess.rounds.plugins.urlcharacteritems";
+        internal const string ModName = "URL Character Items";
         public const string Version = "0.0.0";
         internal static string CompatibilityModName => ModName.Replace(" ", "");
 
-        public static PlayerCustomization instance;
+        public static URLCharacterItems instance;
 
         private Harmony harmony;
 
@@ -34,11 +26,11 @@ namespace PlayerCustomization
 #else
         public static readonly bool DEBUG = false;
 #endif
-        internal static void Log(object log)
+        internal static void Log(string str)
         {
             if (DEBUG)
             {
-                UnityEngine.Debug.Log($"[{ModName}] {log}");
+                UnityEngine.Debug.Log($"[{ModName}] {str}");
             }
         }
 
@@ -46,32 +38,28 @@ namespace PlayerCustomization
         private void Awake()
         {
             instance = this;
-            
+
             harmony = new Harmony(ModId);
             harmony.PatchAll();
-            
-            On.MainMenuHandler.Awake += (orig, self) =>
-            {
-                this.ExecuteAfterFrames(10, () =>
-                {
-                    CustomCharacterItemManager.UpdateCharacterCreator();
-                });
-
-                orig(self);
-            };
         }
         private void Start()
         {
             // add credits
-            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess"});
+            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess" });
+
+            // add GUI to modoptions menu
+            Unbound.RegisterMenu(ModName, () => { }, URLCharacterItemManager.URLItemsMenu, null, false);
+
+            // init url character item manager
+            URLCharacterItemManager.Init();
+            URLCharacterItemManager.AddItemsToCharacterCreator();
+
         }
 
         private void OnDestroy()
         {
             harmony.UnpatchAll();
         }
-
-        internal static string GetConfigKey(string key) => $"{PlayerCustomization.ModName}_{key}";
 
         private static void GUI(GameObject menu)
         {
