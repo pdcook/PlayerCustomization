@@ -116,6 +116,16 @@
   <ItemGroup>
     <Compile Include="CustomCharacterItemManager.cs" />
     <Compile Include="Extensions\CharacterCreatorItemLoader.cs" />
+    <Compile Include="Extensions\CharacterItem.cs" />
+    <Compile Include="Patches\CharacterCreatorItemLoader.cs" />
+    <Compile Include="Patches\CharacterItemMirror.cs" />
+    <Compile Include="Patches\CharacterItem.cs" />
+    <Compile Include="Patches\CopyChildren.cs" />
+    <Compile Include="UniGif\UniGif.cs" />
+    <Compile Include="UniGif\UniGifConst.cs" />
+    <Compile Include="UniGif\UniGifDecoder.cs" />
+    <Compile Include="UniGif\UniGifExtension.cs" />
+    <Compile Include="UniGif\UniGifFormatter.cs" />
     <Compile Include="URLCharacterItemManager.cs" />
     <Compile Include="URLCharacterItem.cs" />
     <Compile Include="PlayerCustomization.cs" />

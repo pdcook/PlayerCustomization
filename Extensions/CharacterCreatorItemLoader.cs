@@ -27,7 +27,7 @@ namespace GameModeCollection.Extensions
                     return -1;
             }
         }
-        public static int GetRandomItemID(this CharacterCreatorItemLoader instance, CharacterItemType type, string[] bannedItemNames = null)
+        public static int GetRandomItemID(this CharacterCreatorItemLoader instance, CharacterItemType type, string[] bannedItemNames = null, bool allowCustomItems = true)
         {
             CharacterItem[] items;
 
@@ -46,13 +46,19 @@ namespace GameModeCollection.Extensions
                     return -1;
             }
 
-            if (bannedItemNames is null)
+            if (bannedItemNames is null && allowCustomItems)
             {
                 return UnityEngine.Random.Range(0, items.Count());
             }
-            else
+            else if (allowCustomItems)
             {
                 CharacterItem[] validItems = items.Where(i => !bannedItemNames.Contains(i.name)).ToArray();
+                if (validItems.Count() == 0) { return UnityEngine.Random.Range(0, items.Count()); }
+                return (int)instance.InvokeMethod("GetItemID", validItems.GetRandom<CharacterItem>(), type);
+            }
+            else
+            {
+                CharacterItem[] validItems = items.Where(i => !bannedItemNames.Contains(i.name) && !i.name.Contains("CUSTOM")).ToArray();
                 if (validItems.Count() == 0) { return UnityEngine.Random.Range(0, items.Count()); }
                 return (int)instance.InvokeMethod("GetItemID", validItems.GetRandom<CharacterItem>(), type);
             }

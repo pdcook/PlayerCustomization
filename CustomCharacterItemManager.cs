@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Linq;
+using UnboundLib;
 namespace PlayerCustomization
 {
     public static class CustomCharacterItemManager
     {
         public static void AddCustomCharacterItem(GameObject item, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
         {
+            item.name = $"(CUSTOM) {item.name}";
             item.layer = LayerMask.NameToLayer("Player");
             foreach (SpriteRenderer sprite in item.GetComponentsInChildren<SpriteRenderer>(true))
             {
@@ -23,7 +25,7 @@ namespace PlayerCustomization
                         break;
                 }
             }
-            CharacterItem characterItem = item.AddComponent<CharacterItem>();
+            CharacterItem characterItem = item.GetOrAddComponent<CharacterItem>();
             characterItem.itemType = itemType;
             characterItem.scale = scale;
             characterItem.moveHealthBarUp = moveHealthBarUp;

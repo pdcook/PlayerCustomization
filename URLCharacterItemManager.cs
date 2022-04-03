@@ -37,6 +37,10 @@ namespace PlayerCustomization
             }
 
         }
+        public static string ItemGameObjectName(int ID, CharacterItemType type)
+        {
+            return $"URL_{type}_{ID}".ToUpper();
+        }
 
         public static void CreateURLCharacterItemPrefab(int ID, CharacterItemType itemType, string url = defaultURL)
         {
@@ -54,13 +58,10 @@ namespace PlayerCustomization
                 UnityEngine.Debug.LogError($"URLCharacterItemManager: CreateURLCharacterItemPrefab: {itemType} item with ID {ID} already exists.");
                 return;
             }
-            GameObject prefab = new GameObject($"URL {GetDefaultItemName(ID, itemType)}");
+            GameObject prefab = new GameObject(ItemGameObjectName(ID, itemType));
             UnityEngine.GameObject.DontDestroyOnLoad(prefab);
-            URLCharacterItem item = prefab.AddComponent<URLCharacterItem>();
-            item.URLItemID = ID;
-            item.ItemType = itemType;
-            prefab.AddComponent<SpriteRenderer>();
-            item.URL = url;
+            URLCharacterItem item = prefab.GetOrAddComponent<URLCharacterItem>();
+            prefab.GetOrAddComponent<SpriteRenderer>();
             items[itemType][ID] = item;
         }
         public static void AddItemsToCharacterCreator()
@@ -88,7 +89,14 @@ namespace PlayerCustomization
             return items[itemType][ID];
         }
         internal static string GetConfigKey(string key) => $"{PlayerCustomization.CompatibilityModName}_URLItem_{key}";
-
+        public static bool GetRemoteURLObjectsEnabled()
+        {
+            return PlayerPrefs.GetInt(GetConfigKey("RemoteURLObjectsEnabled"), 1) == 1;
+        }
+        public static void SetRemoteURLObjectsEnabled(bool enabled)
+        {
+            PlayerPrefs.SetInt(GetConfigKey("RemoteURLObjectsEnabled"), enabled ? 1 : 0);
+        }
         public static string GetURL(int itemID, CharacterItemType itemType)
         {
             return PlayerPrefs.GetString(GetConfigKey($"{itemType}{itemID}URL"), defaultURL);
@@ -135,6 +143,8 @@ namespace PlayerCustomization
 
         internal static void URLItemsMenu(GameObject menu)
         {
+            MenuHandler.CreateText("CUSTOM PLAYER OBJECTS", menu, out var _, 60);
+            MenuHandler.CreateText(" ", menu, out var _, 30);
             // initialize dictionaries
             itemButtons[CharacterItemType.Eyes] = new List<List<TextMeshProUGUI>>() { };
             itemButtons[CharacterItemType.Mouth] = new List<List<TextMeshProUGUI>>() { };
@@ -152,6 +162,12 @@ namespace PlayerCustomization
             ItemsMenu(eyesMenu, CharacterItemType.Eyes);
             ItemsMenu(mouthsMenu, CharacterItemType.Mouth);
             ItemsMenu(detailsMenu, CharacterItemType.Detail);
+            MenuHandler.CreateText(" ", menu, out var _, 30);
+            // add toggle for enabling/disabling remote URL objects
+            MenuHandler.CreateToggle(GetRemoteURLObjectsEnabled(),"Show Online Players' Custom Items", menu, (bool enabled) =>
+            {
+                SetRemoteURLObjectsEnabled(enabled);
+            }, 60, alignmentOptions: TextAlignmentOptions.Center);
         }
         private static void ItemsMenu(GameObject menu, CharacterItemType itemType)
         {
@@ -225,16 +241,22 @@ namespace PlayerCustomization
             MenuHandler.CreateInputField(GetItemName(ID_, itemType_), 60, menu, v=>ChangeItemName(v, ID_, itemType_));
             void ChangeURL(string newURL, int ID, CharacterItemType itemType)
             {
-                // check if the new URL ends with '.png', '.jpg', or '.jpeg'
+                // check that the new URL starts with 'http'
+                if (!newURL.StartsWith("http", true, System.Globalization.CultureInfo.InvariantCulture))
+                {
+                    return;
+                }
+                // check if the new URL ends with '.png', '.jpg', '.jpeg', or '.gif' (special case)
                 if (  !newURL.EndsWith(".png", true, System.Globalization.CultureInfo.InvariantCulture)
                     & !newURL.EndsWith(".jpg", true, System.Globalization.CultureInfo.InvariantCulture)
-                    & !newURL.EndsWith(".jpeg", true, System.Globalization.CultureInfo.InvariantCulture))
+                    & !newURL.EndsWith(".jpeg", true, System.Globalization.CultureInfo.InvariantCulture)
+                    & !newURL.EndsWith(".gif", true, System.Globalization.CultureInfo.InvariantCulture)
+                    )
                 {
                     return;
                 }
 
                 SetURL(ID, itemType, newURL);
-                GetURLCharacterItemPrefab(ID, itemType).URL = newURL;
                 if (currentPreviewItem != null)
                 {
                     currentPreviewItem.SetImage(newURL);
@@ -246,12 +268,12 @@ namespace PlayerCustomization
                 SetScale(ID, itemType, newScale);
                 if (currentPreviewItem != null) { currentPreviewItem.transform.localScale = Vector3.one * newScale; }
             }
-            MenuHandler.CreateSlider("Scale", menu, 45, 0f, 10f, 1f, v => ChangeScale(v, ID_, itemType_), out Slider _, false);
+            MenuHandler.CreateSlider("Scale", menu, 45, 0f, 10f, GetScale(ID_, itemType_), v => ChangeScale(v, ID_, itemType_), out Slider _, false);
             void ChangeHealthBarOffset(float newOffset, int ID, CharacterItemType itemType)
             {
                 SetHealthBarOffset(ID, itemType, newOffset);
             }
-            MenuHandler.CreateSlider("Health Bar Offset", menu, 45, 0f, 2f, 0f, v => ChangeHealthBarOffset(v, ID_, itemType_), out Slider _, false);
+            MenuHandler.CreateSlider("Health Bar Offset", menu, 45, 0f, 2f, GetHealthBarOffset(ID_, itemType_), v => ChangeHealthBarOffset(v, ID_, itemType_), out Slider _, false);
 
             // add action to back button to destroy the item and hide the preview object
             menu.transform.Find("Group/Back").gameObject.GetComponent<Button>().onClick.AddListener(() =>

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerCustomization", "PlayerCustomization.csproj", "{615FD723-E714-4F78-9BAE-DC91790F95C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "URLCharacterItems", "URLCharacterItems\URLCharacterItems.csproj", "{8B4F78CC-264C-49DB-B558-99156FFA4D9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{615FD723-E714-4F78-9BAE-DC91790F95C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{615FD723-E714-4F78-9BAE-DC91790F95C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{615FD723-E714-4F78-9BAE-DC91790F95C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B4F78CC-264C-49DB-B558-99156FFA4D9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4F78CC-264C-49DB-B558-99156FFA4D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B4F78CC-264C-49DB-B558-99156FFA4D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B4F78CC-264C-49DB-B558-99156FFA4D9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
