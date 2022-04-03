@@ -9,17 +9,17 @@ namespace PlayerCustomizationUtils
     public static class CustomCharacterItemManager
     {
         private static Dictionary<CharacterItemType, List<CharacterItem>> CustomItems = new Dictionary<CharacterItemType, List<CharacterItem>>();
-        public static void AddCustomCharacterItem(string pathToPNG, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
+        public static void AddCustomCharacterItem(string pathToPNG, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f, string itemName = null)
         {
             byte[] bytes = File.ReadAllBytes(pathToPNG);
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(bytes);
             Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            AddCustomCharacterItem(sprite, itemType, scale, moveHealthBarUp);
+            AddCustomCharacterItem(sprite, itemType, scale, moveHealthBarUp, itemName);
         }
-        public static void AddCustomCharacterItem(Sprite sprite, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
+        public static void AddCustomCharacterItem(Sprite sprite, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f, string itemName = null)
         {
-            GameObject newItem = new GameObject(Guid.NewGuid().ToString(), typeof(SpriteRenderer), typeof(CharacterItem));
+            GameObject newItem = new GameObject(itemName ?? Guid.NewGuid().ToString(), typeof(SpriteRenderer), typeof(CharacterItem));
             newItem.GetComponent<SpriteRenderer>().sprite = sprite;
             AddCustomCharacterItem(newItem, itemType, scale, moveHealthBarUp);
         }
