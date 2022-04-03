@@ -6,7 +6,7 @@ using UnboundLib;
 using System.Linq;
 using Photon.Pun;
 using System;
-using PlayerCustomization.Extensions;
+using PlayerCustomizationUtils.Extensions;
 using System.Collections.Generic;
 using TMPro;
 using Photon.Realtime;

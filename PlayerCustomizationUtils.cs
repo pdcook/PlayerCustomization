@@ -13,19 +13,19 @@ using UnboundLib.Networking;
 using Photon.Pun;
 using On;
 
-namespace PlayerCustomization
+namespace PlayerCustomizationUtils
 {
     [BepInDependency("com.willis.rounds.unbound", BepInDependency.DependencyFlags.HardDependency)] // necessary for most modding stuff here
     [BepInPlugin(ModId, ModName, Version)]
     [BepInProcess("Rounds.exe")]
-    public class PlayerCustomization : BaseUnityPlugin
+    public class PlayerCustomizationUtils : BaseUnityPlugin
     {
-        private const string ModId = "pykess.rounds.plugins.playercustomization";
-        internal const string ModName = "Player Customization";
+        private const string ModId = "pykess.rounds.plugins.playercustomizationutils";
+        internal const string ModName = "Player Customization Utilities";
         public const string Version = "0.0.0";
         internal static string CompatibilityModName => ModName.Replace(" ", "");
 
-        public static PlayerCustomization instance;
+        public static PlayerCustomizationUtils instance;
 
         private Harmony harmony;
 
@@ -71,7 +71,7 @@ namespace PlayerCustomization
             harmony.UnpatchAll();
         }
 
-        internal static string GetConfigKey(string key) => $"{PlayerCustomization.ModName}_{key}";
+        internal static string GetConfigKey(string key) => $"{PlayerCustomizationUtils.ModName}_{key}";
 
         private static void GUI(GameObject menu)
         {

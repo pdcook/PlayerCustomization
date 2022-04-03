@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace PlayerCustomization.Extensions
+namespace PlayerCustomizationUtils.Extensions
 {
     public static class CharacterItemExtensions
     {

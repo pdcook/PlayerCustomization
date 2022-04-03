@@ -3,7 +3,7 @@ using System.Linq;
 using UnboundLib;
 using System.Collections.Generic;
 using System;
-namespace PlayerCustomization
+namespace PlayerCustomizationUtils
 {
     public static class CustomCharacterItemManager
     {

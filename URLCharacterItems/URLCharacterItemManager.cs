@@ -5,7 +5,7 @@ using UnboundLib;
 using TMPro;
 using UnityEngine.UI;
 using UnboundLib.Utils.UI;
-using PlayerCustomization;
+using PlayerCustomizationUtils;
 namespace URLCharacterItems
 {
     public static class URLCharacterItemManager

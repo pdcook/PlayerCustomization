@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using HarmonyLib;
-namespace PlayerCustomization.Patches
+namespace PlayerCustomizationUtils.Patches
 {
     [HarmonyPatch(typeof(CharacterCreatorItemLoader), "GetItemID")]
     class CharacterCreatorItemLoader_Patch_GetItemID

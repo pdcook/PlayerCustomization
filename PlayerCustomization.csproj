@@ -121,7 +121,7 @@
     <Compile Include="Patches\CharacterItemMirror.cs" />
     <Compile Include="Patches\CharacterItem.cs" />
     <Compile Include="Patches\CopyChildren.cs" />
-    <Compile Include="PlayerCustomization.cs" />
+    <Compile Include="PlayerCustomizationUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

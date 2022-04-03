@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using HarmonyLib;
-namespace PlayerCustomization.Patches
+namespace PlayerCustomizationUtils.Patches
 {
     [HarmonyPatch(typeof(CopyChildren), nameof(CopyChildren.DoUpdate))]
     class CopyChildren_Patch_DoUpdate
