@@ -3,11 +3,26 @@ using System.Linq;
 using UnboundLib;
 using System.Collections.Generic;
 using System;
+using System.IO;
 namespace PlayerCustomizationUtils
 {
     public static class CustomCharacterItemManager
     {
         private static Dictionary<CharacterItemType, List<CharacterItem>> CustomItems = new Dictionary<CharacterItemType, List<CharacterItem>>();
+        public static void AddCustomCharacterItem(string pathToPNG, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
+        {
+            byte[] bytes = File.ReadAllBytes(pathToPNG);
+            Texture2D tex = new Texture2D(2, 2);
+            tex.LoadImage(bytes);
+            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            AddCustomCharacterItem(sprite, itemType, scale, moveHealthBarUp);
+        }
+        public static void AddCustomCharacterItem(Sprite sprite, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
+        {
+            GameObject newItem = new GameObject(Guid.NewGuid().ToString(), typeof(SpriteRenderer), typeof(CharacterItem));
+            newItem.GetComponent<SpriteRenderer>().sprite = sprite;
+            AddCustomCharacterItem(newItem, itemType, scale, moveHealthBarUp);
+        }
         public static void AddCustomCharacterItem(GameObject item, CharacterItemType itemType, float scale = 1f, float moveHealthBarUp = 0f)
         {
             item.name = $"(CUSTOM) {item.name}";

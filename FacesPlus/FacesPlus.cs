@@ -4,7 +4,6 @@ using TMPro;
 using UnboundLib;
 using UnboundLib.Utils.UI;
 using UnityEngine;
-using Jotunn.Utils;
 using PlayerCustomizationUtils;
 using System.IO;
 
@@ -21,8 +20,6 @@ namespace FacesPlus
         internal static string CompatibilityModName => ModName.Replace(" ", "");
 
         public static FacesPlus instance;
-
-        private static AssetBundle images;
 
         private Harmony harmony;
 
@@ -52,18 +49,6 @@ namespace FacesPlus
             // add credits
             Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess" });
 
-            try
-            {
-                images = AssetUtils.LoadAssetBundleFromResources("images", typeof(FacesPlus).Assembly);
-                if (images == null)
-                {
-                    UnityEngine.Debug.LogError("Failed to load Faces+ Assets.");
-                }
-            }
-            catch
-            {
-                // ignored
-            }
             string[] img_files = Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories);
             foreach (string file in img_files)
             {

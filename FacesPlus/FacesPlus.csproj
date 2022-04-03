@@ -121,7 +121,6 @@
     <Content Include="ThunderStore\icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AssetsEmbedded\images" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
