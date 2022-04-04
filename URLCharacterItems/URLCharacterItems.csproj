@@ -103,11 +103,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UniGif\UniGif.cs" />
-    <Compile Include="UniGif\UniGifConst.cs" />
-    <Compile Include="UniGif\UniGifDecoder.cs" />
-    <Compile Include="UniGif\UniGifExtension.cs" />
-    <Compile Include="UniGif\UniGifFormatter.cs" />
     <Compile Include="URLCharacterItems.cs" />
     <Compile Include="URLCharacterItemManager.cs" />
     <Compile Include="URLCharacterItem.cs" />

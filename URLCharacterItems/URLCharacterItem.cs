@@ -10,6 +10,7 @@ using PlayerCustomizationUtils.Extensions;
 using System.Collections.Generic;
 using TMPro;
 using Photon.Realtime;
+using UniGif;
 namespace URLCharacterItems
 {
     public class URLCharacterItem : MonoBehaviour
@@ -19,7 +20,7 @@ namespace URLCharacterItems
 
         // extra stuff for handling GIFs separately
         public bool IsGif { get; private set; } = false;
-        public List<UniGif.GifTexture> GifTextures { get; private set; } = null;
+        public List<UniGif.UniGif.GifTexture> GifTextures { get; private set; } = null;
         private float gifDelayTime = 0f;
         private int gifTextureIndex = 0;
 
@@ -174,7 +175,7 @@ namespace URLCharacterItems
                     }
                     else
                     {
-                        yield return UniGif.GetTextureListCoroutine(www.downloadHandler.data, (texList, loopCount, width, height) =>
+                        yield return UniGif.UniGif.GetTextureListCoroutine(www.downloadHandler.data, (texList, loopCount, width, height) =>
                         {
                             if (texList != null)
                             {

@@ -121,12 +121,18 @@
     <Compile Include="CustomCharacterItemManager.cs" />
     <Compile Include="Extensions\CharacterCreatorItemLoader.cs" />
     <Compile Include="Extensions\CharacterItem.cs" />
+    <Compile Include="GifCharacterItem.cs" />
     <Compile Include="Patches\CharacterCreatorItemLoader.cs" />
     <Compile Include="Patches\CharacterItemMirror.cs" />
     <Compile Include="Patches\CharacterItem.cs" />
     <Compile Include="Patches\CopyChildren.cs" />
     <Compile Include="PlayerCustomizationUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UniGif\UniGif.cs" />
+    <Compile Include="UniGif\UniGifConst.cs" />
+    <Compile Include="UniGif\UniGifDecoder.cs" />
+    <Compile Include="UniGif\UniGifExtension.cs" />
+    <Compile Include="UniGif\UniGifFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />

@@ -7,6 +7,7 @@ using UnityEngine;
 using PlayerCustomizationUtils;
 using System.IO;
 using System;
+using System.Linq;
 
 namespace FacesPlus
 {
@@ -51,6 +52,7 @@ namespace FacesPlus
             Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess" });
 
             string[] img_files = Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories);
+            img_files = img_files.Concat(Directory.GetFiles(Paths.PluginPath, "*.gif", SearchOption.AllDirectories)).ToArray();
             CharacterItemType itemType;
             foreach (string file in img_files)
             {
@@ -64,30 +66,32 @@ namespace FacesPlus
                 bool matchPlayerColor = false;
                 if (file.Contains("MATCHCOLOR")) { matchPlayerColor = true; }
 
-                Vector2 scaleAndOffset = this.ReadScaleAndHealthBarOffset(file);
+                Vector3 scaleAndOffset = this.ReadExtraProperties(file);
                 float scale = scaleAndOffset.x;
                 float moveHealthBarUp = scaleAndOffset.y;
+                float brightness = scaleAndOffset.z;
 
                 if (!matchPlayerColor)
                 {
-                    CustomCharacterItemManager.AddCustomCharacterItem(file, itemType, scale, moveHealthBarUp);
+                    CustomCharacterItemManager.AddCustomCharacterItem(file, itemType, scale, moveHealthBarUp, brightness);
                 }
                 else
                 {
                     GameObject item = ColorMatchingItem(file);
-                    CustomCharacterItemManager.AddCustomCharacterItem(item, itemType, scale, moveHealthBarUp);
+                    CustomCharacterItemManager.AddCustomCharacterItem(item, itemType, scale, moveHealthBarUp, brightness);
                 }
             }
             // add a blank eye object since none exist in the vanilla game
-            CustomCharacterItemManager.AddCustomCharacterItem((Sprite)null, CharacterItemType.Eyes, 1, 0, "blank");
+            CustomCharacterItemManager.AddCustomCharacterItem((Sprite)null, CharacterItemType.Eyes, 1, 0, 1f, "blank");
 
         }
 
-        private Vector2 ReadScaleAndHealthBarOffset(string filename)
+        private Vector3 ReadExtraProperties(string filename)
         {
             float scale = 1f;
             float healthBarOffset = 0f;
-            string[] parts = filename.ToLower().Replace(".png","").Split(new char[] { '_', ' ', '-' });
+            float brightness = 1f;
+            string[] parts = filename.ToLower().Replace(".png","").Replace(".gif","").Split(new char[] { '_', ' ', '-' });
             for (int i = 0; i < parts.Length; i++)
             {
                 if (parts[i].Equals("scale"))
@@ -98,8 +102,12 @@ namespace FacesPlus
                 {
                     float.TryParse(parts[i + 1], out healthBarOffset);
                 }
+                if (parts[i].Equals("brightness"))
+                {
+                    float.TryParse(parts[i + 1], out brightness);
+                }
             }
-            return new Vector2(scale, healthBarOffset);
+            return new Vector3(scale, healthBarOffset, brightness);
         }
         
         private GameObject ColorMatchingItem(string file)
