@@ -58,22 +58,29 @@ namespace FacesPlus
             {
                 if (!file.Contains("\\FACESPLUS\\")) { continue; }
 
-                if (file.Contains("\\DETAIL\\")) { itemType = CharacterItemType.Detail; }
+                if (file.Contains("\\DETAIL\\") || file.Contains("\\BODY\\")) { itemType = CharacterItemType.Detail; }
                 else if (file.Contains("\\EYES\\")) { itemType = CharacterItemType.Eyes; }
                 else if (file.Contains("\\MOUTH\\")) { itemType = CharacterItemType.Mouth; }
                 else { continue; }
 
                 bool matchPlayerColor = false;
+                bool isBodyItem = false;
                 if (file.Contains("MATCHCOLOR")) { matchPlayerColor = true; }
+                if (file.Contains("\\BODY\\")) { isBodyItem = true; }
 
                 Vector3 scaleAndOffset = this.ReadExtraProperties(file);
                 float scale = scaleAndOffset.x;
                 float moveHealthBarUp = scaleAndOffset.y;
                 float brightness = scaleAndOffset.z;
 
-                if (!matchPlayerColor)
+                if (!matchPlayerColor && !isBodyItem)
                 {
                     CustomCharacterItemManager.AddCustomCharacterItem(file, itemType, scale, moveHealthBarUp, brightness);
+                }
+                else if (isBodyItem)
+                {
+                    GameObject item = BodyItem(file);
+                    CustomCharacterItemManager.AddCustomCharacterItem(item, itemType, 1f, moveHealthBarUp, 1f);
                 }
                 else
                 {
@@ -116,9 +123,20 @@ namespace FacesPlus
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(bytes);
             Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            GameObject item = new GameObject(Guid.NewGuid().ToString(), typeof(SpriteRenderer), typeof(MatchPlayerColor));
+            GameObject item = new GameObject(Path.GetFileNameWithoutExtension(file), typeof(SpriteRenderer), typeof(ColorMatchingCharacterItem));
             item.GetComponent<SpriteRenderer>().sprite = sprite;
 
+            return item;
+        }
+        private GameObject BodyItem(string file)
+        {
+            byte[] bytes = File.ReadAllBytes(file);
+            Texture2D tex = new Texture2D(2, 2);
+            tex.LoadImage(bytes);
+            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            GameObject item = new GameObject(Path.GetFileNameWithoutExtension(file), typeof(SpriteRenderer), typeof(BodyCharacterItem));
+            item.GetComponent<SpriteRenderer>().sprite = sprite;
+            item.GetComponent<SpriteRenderer>().enabled = false;
             return item;
         }
 
@@ -133,19 +151,4 @@ namespace FacesPlus
             MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
         }
     }
-    class MatchPlayerColor : MonoBehaviour
-    {
-        void Update()
-        {
-            Color? color = this.gameObject?.transform?.parent?.parent?.Find("Health")?.GetComponent<SpriteRenderer>()?.color;
-            if (color is null)
-            {
-                color = this.gameObject?.transform?.parent?.parent?.Find("Face")?.GetComponent<SpriteRenderer>()?.color;
-            }
-            if (color != null)
-            {
-                this.gameObject.GetComponent<SpriteRenderer>().color = color.Value;
-            }
-        }
     }
-}

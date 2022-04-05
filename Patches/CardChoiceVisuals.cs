@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using UnboundLib.Extensions;
-namespace FacesPlus.Patches
+namespace PlayerCustomizationUtils.Patches
 {
     [HarmonyPatch(typeof(CardChoiceVisuals), nameof(CardChoiceVisuals.Show))]
     internal class CardChoiceVisuals_Patch_Show

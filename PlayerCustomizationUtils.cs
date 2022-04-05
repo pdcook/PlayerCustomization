@@ -27,6 +27,8 @@ namespace PlayerCustomizationUtils
 
         public static PlayerCustomizationUtils instance;
 
+        public const int CharacterCreatorColumns = 17;
+
         private Harmony harmony;
 
 #if DEBUG
