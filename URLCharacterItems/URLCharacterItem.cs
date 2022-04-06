@@ -21,8 +21,9 @@ namespace URLCharacterItems
         // extra stuff for handling GIFs separately
         public bool IsGif { get; private set; } = false;
         public List<UniGif.UniGif.GifTexture> GifTextures { get; private set; } = null;
+        public List<Sprite> GifSprites { get; private set; } = null;
         private float gifDelayTime = 0f;
-        private int gifTextureIndex = 0;
+        private int gifSpriteIndex = 0;
 
         public string URL { get; private set; } // the url of the item
         CharacterItem Item => this.GetComponent<CharacterItem>();
@@ -152,13 +153,13 @@ namespace URLCharacterItems
         void Update()
         {
             // if the item is a GIF, then we need to update the texture every so often
-            if (this.IsGif && this.GifTextures != null && this.GifTextures.Count() > 0 && this.gifDelayTime <= Time.time)
+            if (this.IsGif && this.GifSprites != null && this.GifSprites.Count() > 0 && this.gifDelayTime <= Time.time)
             {
-                this.gifTextureIndex = (this.gifTextureIndex + 1) % this.GifTextures.Count();
-                if (this.gifTextureIndex < 0) { this.gifTextureIndex += this.GifTextures.Count(); }
-                this.gifDelayTime = Time.time + this.GifTextures[this.gifTextureIndex].m_delaySec;
-                
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(this.GifTextures[this.gifTextureIndex].m_texture2d, new Rect(0, 0, this.GifTextures[this.gifTextureIndex].m_texture2d.width, this.GifTextures[this.gifTextureIndex].m_texture2d.height), new Vector2(0.5f, 0.5f));
+                this.gifSpriteIndex = (this.gifSpriteIndex + 1) % this.GifSprites.Count();
+                if (this.gifSpriteIndex < 0) { this.gifSpriteIndex += this.GifSprites.Count(); }
+                this.gifDelayTime = Time.time + this.GifTextures[this.gifSpriteIndex].m_delaySec;
+
+                this.gameObject.GetComponent<SpriteRenderer>().sprite = this.GifSprites[this.gifSpriteIndex];
             }
         }
         IEnumerator DownloadAndSetImage(string url)
@@ -175,20 +176,21 @@ namespace URLCharacterItems
                     }
                     else
                     {
-                        yield return UniGif.UniGif.GetTextureListCoroutine(www.downloadHandler.data, (texList, loopCount, width, height) =>
+                        yield return UniGif.UniGif.GetTextureListCoroutine(www.downloadHandler.data, (Action<List<UniGif.UniGif.GifTexture>, int, int, int>)((texList, loopCount, width, height) =>
                         {
                             if (texList != null)
                             {
                                 this.GifTextures = texList;
+                                this.GifSprites = texList.Select(t => Sprite.Create(t.m_texture2d, new Rect(0, 0, t.m_texture2d.width, t.m_texture2d.height), new Vector2(0.5f, 0.5f))).ToList();
                                 this.IsGif = true;
-                                this.gifTextureIndex = 0;
+                                this.gifSpriteIndex = 0;
                                 this.gifDelayTime = 0f;
                             }
                             else
                             {
                                 UnityEngine.Debug.LogError($"URLCharacterItem: Failed to decode gif | URL: {url}");
                             }
-                        }, FilterMode.Bilinear, TextureWrapMode.Clamp, true);
+                        }), FilterMode.Bilinear, TextureWrapMode.Clamp, true);
                     }
                 }
             }

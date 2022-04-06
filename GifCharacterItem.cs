@@ -16,10 +16,11 @@ namespace PlayerCustomizationUtils
     public class GifCharacterItem : MonoBehaviour
     {
         public List<UniGif.UniGif.GifTexture> GifTextures { get; private set; } = null;
+        public List<Sprite> GifSprites { get; private set; } = null;
         private float gifDelayTime = 0f;
-        private int gifTextureIndex = 0;
+        private int gifSpriteIndex = 0;
         public byte[] gifData = null;
-
+        
         void Start()
         {
             SetGif(this.gifData);
@@ -27,13 +28,13 @@ namespace PlayerCustomizationUtils
         void Update()
         {
             // update the texture every so often
-            if (this.GifTextures != null && this.GifTextures.Count() > 0 && this.gifDelayTime <= Time.time)
+            if (this.GifSprites != null && this.GifSprites.Count() > 0 && this.gifDelayTime <= Time.time)
             {
-                this.gifTextureIndex = (this.gifTextureIndex + 1) % this.GifTextures.Count();
-                if (this.gifTextureIndex < 0) { this.gifTextureIndex += this.GifTextures.Count(); }
-                this.gifDelayTime = Time.time + this.GifTextures[this.gifTextureIndex].m_delaySec;
+                this.gifSpriteIndex = (this.gifSpriteIndex + 1) % this.GifSprites.Count();
+                if (this.gifSpriteIndex < 0) { this.gifSpriteIndex += this.GifSprites.Count(); }
+                this.gifDelayTime = Time.time + this.GifTextures[this.gifSpriteIndex].m_delaySec;
 
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(this.GifTextures[this.gifTextureIndex].m_texture2d, new Rect(0, 0, this.GifTextures[this.gifTextureIndex].m_texture2d.width, this.GifTextures[this.gifTextureIndex].m_texture2d.height), new Vector2(0.5f, 0.5f));
+                this.gameObject.GetComponent<SpriteRenderer>().sprite = this.GifSprites[this.gifSpriteIndex];
             }
         }
         IEnumerator LoadGif(byte[] bytes)
@@ -43,7 +44,8 @@ namespace PlayerCustomizationUtils
                 if (texList != null)
                 {
                     this.GifTextures = texList;
-                    this.gifTextureIndex = 0;
+                    this.GifSprites = texList.Select(t => Sprite.Create(t.m_texture2d, new Rect(0, 0, t.m_texture2d.width, t.m_texture2d.height), new Vector2(0.5f, 0.5f))).ToList();
+                    this.gifSpriteIndex = 0;
                     this.gifDelayTime = 0f;
                 }
                 else

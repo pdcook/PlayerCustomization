@@ -58,15 +58,15 @@ namespace FacesPlus
             {
                 if (!file.Contains("\\FACESPLUS\\")) { continue; }
 
-                if (file.Contains("\\DETAIL\\") || file.Contains("\\BODY\\")) { itemType = CharacterItemType.Detail; }
-                else if (file.Contains("\\EYES\\")) { itemType = CharacterItemType.Eyes; }
-                else if (file.Contains("\\MOUTH\\")) { itemType = CharacterItemType.Mouth; }
+                if (file.Contains("\\0-DETAIL\\") || file.Contains("\\1-BODY\\")) { itemType = CharacterItemType.Detail; }
+                else if (file.Contains("\\2-EYES\\")) { itemType = CharacterItemType.Eyes; }
+                else if (file.Contains("\\3-MOUTH\\")) { itemType = CharacterItemType.Mouth; }
                 else { continue; }
 
                 bool matchPlayerColor = false;
                 bool isBodyItem = false;
                 if (file.Contains("MATCHCOLOR")) { matchPlayerColor = true; }
-                if (file.Contains("\\BODY\\")) { isBodyItem = true; }
+                if (file.Contains("\\1-BODY\\")) { isBodyItem = true; }
 
                 Vector3 scaleAndOffset = this.ReadExtraProperties(file);
                 float scale = scaleAndOffset.x;
@@ -131,13 +131,23 @@ namespace FacesPlus
         private GameObject BodyItem(string file)
         {
             byte[] bytes = File.ReadAllBytes(file);
-            Texture2D tex = new Texture2D(2, 2);
-            tex.LoadImage(bytes);
-            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            GameObject item = new GameObject(Path.GetFileNameWithoutExtension(file), typeof(SpriteRenderer), typeof(BodyCharacterItem));
-            item.GetComponent<SpriteRenderer>().sprite = sprite;
-            item.GetComponent<SpriteRenderer>().enabled = false;
-            return item;
+            if(file.EndsWith(".gif", true, System.Globalization.CultureInfo.InvariantCulture))
+            {
+                GameObject item = new GameObject(Path.GetFileNameWithoutExtension(file), typeof(SpriteRenderer), typeof(GifBodyCharacterItem));
+                item.GetComponent<SpriteRenderer>().enabled = false;
+                item.GetComponent<GifBodyCharacterItem>().gifData = bytes;
+                return item;
+            }
+            else
+            {
+                Texture2D tex = new Texture2D(2, 2);
+                tex.LoadImage(bytes);
+                Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                GameObject item = new GameObject(Path.GetFileNameWithoutExtension(file), typeof(SpriteRenderer), typeof(BodyCharacterItem));
+                item.GetComponent<SpriteRenderer>().sprite = sprite;
+                item.GetComponent<SpriteRenderer>().enabled = false;
+                return item;
+            }
         }
 
         private void OnDestroy()
