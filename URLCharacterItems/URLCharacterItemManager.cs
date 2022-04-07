@@ -122,6 +122,14 @@ namespace URLCharacterItems
         {
             PlayerPrefs.SetFloat(GetConfigKey($"{itemType}{itemID}HealthBarOffset"), offset);
         }
+        public static float GetBrightness(int itemID, CharacterItemType itemType)
+        {
+            return PlayerPrefs.GetFloat(GetConfigKey($"{itemType}{itemID}Brightness"), 1f);
+        }
+        public static void SetBrightness(int itemID, CharacterItemType itemType, float brightness)
+        {
+            PlayerPrefs.SetFloat(GetConfigKey($"{itemType}{itemID}Brightness"), brightness);
+        }
 
         internal static string GetDefaultItemName(int id, CharacterItemType itemType)
         {
@@ -270,6 +278,19 @@ namespace URLCharacterItems
                 if (currentPreviewItem != null) { currentPreviewItem.transform.localScale = Vector3.one * newScale; }
             }
             MenuHandler.CreateSlider("Scale", menu, 45, 0f, 10f, GetScale(ID_, itemType_), v => ChangeScale(v, ID_, itemType_), out Slider _, false);
+            void ChangeBrightness(float newBrightness, int ID, CharacterItemType itemType)
+            {
+                SetBrightness(ID, itemType, newBrightness);
+                if (currentPreviewItem?.GetComponentInChildren<SpriteRenderer>(true) != null)
+                {
+                    foreach (SpriteRenderer sprite in currentPreviewItem.GetComponentsInChildren<SpriteRenderer>(true))
+                    {
+                        Color.RGBToHSV(sprite.color, out float h, out float s, out float _);
+                        sprite.color = Color.HSVToRGB(h, s, Mathf.Clamp01(newBrightness));
+                    }
+                }
+            }
+            MenuHandler.CreateSlider("Brightness", menu, 45, 0f, 1f, GetBrightness(ID_, itemType_), v => ChangeBrightness(v, ID_, itemType_), out Slider _, false);
             void ChangeHealthBarOffset(float newOffset, int ID, CharacterItemType itemType)
             {
                 SetHealthBarOffset(ID, itemType, newOffset);

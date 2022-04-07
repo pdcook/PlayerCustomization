@@ -31,6 +31,7 @@ namespace URLCharacterItems
         int SlotNr => (int)Item.GetFieldValue("slotNr");
         public CharacterItemType ItemType { get; private set; }
         public float Scale { get; private set; }
+        public float Brightness { get; private set; } = 1f;
         public float MoveHealthBarUp { get; private set; }
         public bool IsCardChoiceFace { get; private set; } = false;
         public bool IsRWFFace => !String.IsNullOrEmpty(this.RWFFaceName);
@@ -64,8 +65,10 @@ namespace URLCharacterItems
             this.URL = URLCharacterItemManager.GetURL(this.URLItemID, this.ItemType);
             this.Scale = URLCharacterItemManager.GetScale(this.URLItemID, this.ItemType);
             this.MoveHealthBarUp = URLCharacterItemManager.GetHealthBarOffset(this.URLItemID, this.ItemType);
+            this.Brightness = URLCharacterItemManager.GetBrightness(this.URLItemID, this.ItemType);
             this.Item.SetScale(this.Scale);
             this.Item.SetMoveHealthBarUp(this.MoveHealthBarUp);
+            this.SetBrightness(this.Brightness);
         }
 
         void Start()
@@ -214,6 +217,15 @@ namespace URLCharacterItems
                 this.gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(this.texture, new Rect(0, 0, this.texture.width, this.texture.height), new Vector2(0.5f, 0.5f));
             }
         }
+        void SetBrightness(float brightness)
+        {
+            if (this.GetComponentInChildren<SpriteRenderer>(true) is null) { return; }
+            foreach (SpriteRenderer sprite in this.GetComponentsInChildren<SpriteRenderer>(true))
+            {
+                Color.RGBToHSV(sprite.color, out float h, out float s, out float _);
+                sprite.color = Color.HSVToRGB(h, s, Mathf.Clamp01(brightness));
+            }
+        }
 
         internal void SetImage(string url)
         {
@@ -243,6 +255,7 @@ namespace URLCharacterItems
                 instanceID,
                 URLCharacterItemManager.GetScale(itemID, (CharacterItemType)itemType_as_byte),
                 URLCharacterItemManager.GetHealthBarOffset(itemID, (CharacterItemType)itemType_as_byte),
+                URLCharacterItemManager.GetBrightness(itemID, (CharacterItemType)itemType_as_byte),
                 isCardChoiceFace);
 
         }
@@ -261,13 +274,11 @@ namespace URLCharacterItems
             NetworkingManager.RPC(typeof(URLCharacterItem),
                 nameof(RPCA_SetURLItemProperties_ByInstance),
                 new Photon.Realtime.RaiseEventOptions() { TargetActors = new int[] { requestingActor } },
-                URLCharacterItemManager.GetURL(itemID,
-                (CharacterItemType)itemType_as_byte),
+                URLCharacterItemManager.GetURL(itemID, (CharacterItemType)itemType_as_byte),
                 instanceID,
-                URLCharacterItemManager.GetScale(itemID,
-                (CharacterItemType)itemType_as_byte),
-                URLCharacterItemManager.GetHealthBarOffset(itemID,
-                (CharacterItemType)itemType_as_byte));
+                URLCharacterItemManager.GetScale(itemID, (CharacterItemType)itemType_as_byte),
+                URLCharacterItemManager.GetHealthBarOffset(itemID, (CharacterItemType)itemType_as_byte),
+                URLCharacterItemManager.GetBrightness(itemID, (CharacterItemType)itemType_as_byte));
         }
 
         /// <summary>
@@ -279,7 +290,7 @@ namespace URLCharacterItems
         /// <param name="scale">The scale of the item</param>
         /// <param name="moveHealthBarUp">How far to move the health bar up if this item is a Detail</param>
         [UnboundRPC]
-        private static void RPCA_SetURLItemProperties(string url, int playerID, int instanceID, float scale, float moveHealthBarUp, bool isCardChoiceFace)
+        private static void RPCA_SetURLItemProperties(string url, int playerID, int instanceID, float scale, float moveHealthBarUp, float brightness, bool isCardChoiceFace)
         {
             URLCharacterItem item = FindMatchingURLItem(playerID, instanceID, isCardChoiceFace);
             if (item is null)
@@ -291,12 +302,13 @@ namespace URLCharacterItems
             item.SetImage(item.URL);
             item.Item.SetScale(scale);
             item.Item.SetMoveHealthBarUp(moveHealthBarUp);
+            item.SetBrightness(brightness);
         }
         /// <summary>
         /// Sets the url of an item BY INSTANCE, the RPC is sent by the owner
         /// </summary>
         [UnboundRPC]
-        private static void RPCA_SetURLItemProperties_ByInstance(string url, int instanceID, float scale, float moveHealthBarUp)
+        private static void RPCA_SetURLItemProperties_ByInstance(string url, int instanceID, float scale, float moveHealthBarUp, float brightness)
         {
             URLCharacterItem item = FindMatchingURLItem_ByInstance(instanceID);
             if (item is null)
@@ -308,6 +320,7 @@ namespace URLCharacterItems
             item.SetImage(item.URL);
             item.Item.SetScale(scale);
             item.Item.SetMoveHealthBarUp(moveHealthBarUp);
+            item.SetBrightness(brightness);
         }
         private static URLCharacterItem FindMatchingURLItem(int playerID, int instanceID, bool isCardChoiceFace)
         {
