@@ -18,7 +18,7 @@ namespace FacesPlus
     {
         private const string ModId = "pykess.rounds.plugins.facesplus";
         internal const string ModName = "Faces Plus";
-        public const string Version = "0.0.0";
+        public const string Version = "1.0.0";
         internal static string CompatibilityModName => ModName.Replace(" ", "");
 
         public static FacesPlus instance;
@@ -49,8 +49,12 @@ namespace FacesPlus
         private void Start()
         {
             // add credits
-            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess" });
+            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "https://github.com/pdcook/PlayerCustomization", "https://ko-fi.com/pykess" });
 
+            // add a blank eye object since none exist in the vanilla game
+            CustomCharacterItemManager.AddCustomCharacterItem((Sprite)null, CharacterItemType.Eyes, 1, 0, 1f, "blank");
+
+            // read all the custom character items from the plugin directory
             string[] img_files = Directory.GetFiles(Paths.PluginPath, "*.png", SearchOption.AllDirectories);
             img_files = img_files.Concat(Directory.GetFiles(Paths.PluginPath, "*.gif", SearchOption.AllDirectories)).ToArray();
             CharacterItemType itemType;
@@ -88,8 +92,6 @@ namespace FacesPlus
                     CustomCharacterItemManager.AddCustomCharacterItem(item, itemType, scale, moveHealthBarUp, brightness);
                 }
             }
-            // add a blank eye object since none exist in the vanilla game
-            CustomCharacterItemManager.AddCustomCharacterItem((Sprite)null, CharacterItemType.Eyes, 1, 0, 1f, "blank");
 
         }
 

@@ -22,7 +22,7 @@ namespace PlayerCustomizationUtils
     {
         private const string ModId = "pykess.rounds.plugins.playercustomizationutils";
         internal const string ModName = "Player Customization Utilities";
-        public const string Version = "0.0.0";
+        public const string Version = "1.0.0";
         internal static string CompatibilityModName => ModName.Replace(" ", "");
 
         public static PlayerCustomizationUtils instance;
@@ -65,7 +65,7 @@ namespace PlayerCustomizationUtils
         private void Start()
         {
             // add credits
-            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "REPLACE WITH LINK", "https://ko-fi.com/pykess"});
+            Unbound.RegisterCredits(ModName, new string[] { "Pykess" }, new string[] { "github", "Support Pykess" }, new string[] { "https://github.com/pdcook/PlayerCustomization", "https://ko-fi.com/pykess"});
         }
 
         private void OnDestroy()
