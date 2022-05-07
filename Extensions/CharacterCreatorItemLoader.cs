@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using UnboundLib;
-using GameModeCollection.Extensions;
 
-namespace GameModeCollection.Extensions
+namespace PlayerCustomizationUtils.Extensions
 {
-    static class CharacterCreatorItemLoaderExtensions
+    public static class CharacterCreatorItemLoaderExtensions
     {
         public static int GetItemIDByName(this CharacterCreatorItemLoader instance, string name, CharacterItemType type)
         {
@@ -46,7 +45,9 @@ namespace GameModeCollection.Extensions
                     return -1;
             }
 
-            if (bannedItemNames is null && allowCustomItems)
+            bannedItemNames = bannedItemNames ?? new string[0];
+
+            if (bannedItemNames.Length == 0 && allowCustomItems)
             {
                 return UnityEngine.Random.Range(0, items.Count());
             }
